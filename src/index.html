@@ -11,30 +11,79 @@
 </head>
 
 <body class="">
-  <nav class="flex p-4 md:px-20 xl:px-40 py-4 items-center bg-white justify-between text-primary ">
-    <div class="flex gap-4">
-      <h1 class="flex  font-bold text-3xl">mealapp</h1>
-      <div class="search-box">
-        <input type="text" id="search-input" placeholder="Search..." class="block w-full rounded-md py-1.5 pl-7 pr-20 text-primary placeholder:text-gray-400 ring-1 ring-gray-200 
-        focus:ring-inset focus:ring-offset-0 focus:border-0 focus:outline-none 
-        focus:ring-secondary focus:ring-1 sm:text-sm sm:leading-6" />
+  <nav class="flex flex-col p-4 md:px-20 xl:px-40 py-4 items-center bg-white text-primary ">
+    <div class="flex justify-between sm:justify-between w-full">
+      <div class="flex gap-4">
+        <h1 class="flex  font-bold text-3xl">mealapp</h1>
+      </div>
+      <div id="search1" class="search-box hidden sm:flex">
+        <input type="text" placeholder="Search..." class="search-input block w-full rounded-md py-1.5 pl-7 pr-20 text-primary placeholder:text-gray-400 ring-1 ring-gray-200 
+      focus:ring-inset focus:ring-offset-0 focus:border-0 focus:outline-none 
+      focus:ring-secondary focus:ring-1 sm:text-sm sm:leading-6" />
+      </div>
+      <ul class="justify-center items-center font-semibold gap-6 hidden sm:flex">
+        <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Home</a></li>
+        <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Foods</a></li>
+        <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Ingridiens</a></li>
+        <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Local Culinary</a></li>
+      </ul>
+      <div class="flex gap-3 sm:hidden">
+        <button id="searchButton">
+          <img src="/public/search.svg" alt="search" class="block sm:hidden" />
+        </button>
+        <button id="navbarButton">
+          <img src="/public/menu.svg" alt="menu" class="block sm:hidden" />
+        </button>
       </div>
     </div>
-    <ul class="justify-center items-center font-semibold gap-6 hidden sm:flex">
-      <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Home</a></li>
-      <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Foods</a></li>
-      <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Ingridiens</a></li>
-      <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Local Culinary</a></li>
-    </ul>
+    <div id="navMobile" class="hidden w-full justify-start py-4 ">
+      <ul class="flex flex-col font-semibold gap-4">
+        <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Home</a></li>
+        <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Foods</a></li>
+        <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Ingridiens</a></li>
+        <li class="hover:text-secondary transition-all duration-300"><a href="index.html">Local Culinary</a></li>
+      </ul>
+    </div>
+    <div id="navSearch" class="hidden search-box w-full py-4">
+      <input type="text" placeholder="Search..." class="search-input block w-full rounded-md py-1.5 pl-7 pr-20 text-primary placeholder:text-gray-400 ring-1 ring-gray-200 
+        focus:ring-inset focus:ring-offset-0 focus:border-0 focus:outline-none 
+        focus:ring-secondary focus:ring-1 sm:text-sm sm:leading-6" />
+    </div>
   </nav>
   <!-- class="p-4 md:py-10 md:px-20 xl:px-40 w-full min-h-screen flex flex-col grow" -->
-  <main id="app-container" class="w-full min-h-screen flex flex-col" >
+  <main id="app-container" class="w-full min-h-screen flex flex-col transition-all">
     <!-- Konten dinamis akan di-load di sini -->
   </main>
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script type="module" src="/app.js"></script>
+  <script>
+    $("#navbarButton").click(function () {
+      $("#navMobile").toggleClass("hidden");
+      !$("#navSearch").hasClass("hidden") && $("#navSearch").addClass("hidden sm:hidden");;
+      if (!$("#navMobile").hasClass("hidden")) {
+        gsap.from("#navMobile", {
+          duration: 0.8,
+          y: -100,
+          opacity: 0,
+          ease: "sine.out"
+        })
+      }
+    });
+    $("#searchButton").click(function () {
+      $("#navSearch").toggleClass("hidden ");
+      !$("#navMobile").hasClass("hidden") && $("#navMobile").addClass("hidden sm:hidden");;
+      !$("#navSearch").hasClass("hidden") && (
+        gsap.from("#navSearch", {
+          duration: 0.8,
+          y: -20,
+          opacity: 0,
+          ease: "sine.out"
+        })
+      )
+    });
+  </script>
 </body>
 
 </html>

@@ -1,11 +1,3 @@
-// $("#search-input").on("focus", function () {
-//   gsap.to(".search-box", {
-//     width: "100%",
-//     duration: 0.5,
-//   });
-// }
-// );
-
 $(document).ready(function () {
   let allCategories = [];
   let allMeals = [];
@@ -45,14 +37,59 @@ $(document).ready(function () {
       type: 'GET',
       success: function (response) {
         allCategories = response.categories;
+        let categoryHtml = `
+          <div class="flex flex-col h-72 bg-gray-50 justify-center">
+            <div class="flex flex-col gap-6 w-full justify-center items-center ">
+              <div id="jumbotronIcon" class="flex text-secondary gap-4">
+                <img src="/public/soup.svg" alt="Soup" class="text-secondary">
+                <img src="/public/utensils.svg" alt="Utensils" class="text-secondary">
+                <img src="/public/cake.svg" alt="Cake" class="text-secondary">
+              </div>
+              <span id="jumbotronDesc" class="text-xl text-primary font-semibold">mealapp API Website</span>
+            </div>
+            <h1 id="jumbotronLabel" class="text-3xl md:text-[46px] lg:text-[64px] font-bold text-primary text-center my-6">See All The Delicous
+              Foods</h1>
+            </div>
+            <div class="p-4 md:py-10 md:px-20 xl:px-40">
+              <div id="categoryList" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              </div>
+            </div>
+          </div>`;
+        $('#app-container').html(categoryHtml);
         displayCategoryList(allCategories);
+        document.title = 'mealapp';
+        history.pushState({ page: 'category' }, 'Categories', '/');
+        // animasi untuk jumbotronIcon
+        gsap.to("#jumbotronIcon > img", {
+          y: -10,
+          rotate: 360,
+          duration: 1,
+          repeat: -1,
+          repeatDelay: 1,
+          ease: 'elastic.inOut',
+          yoyo: true,
+          stagger: 0.5
+        });
+        gsap.from("#jumbotronLabel", {
+          y: -50,
+          opacity: 0,
+          duration: 1,
+          ease: 'back.out',
+        });
+        gsap.from("#jumbotronDesc", {
+          y: -50,
+          opacity: 0,
+          duration: 1,
+          delay: 0.2,
+          ease: 'back.out',
+        });
       },
       error: function (error) {
         console.error('Error fetching categories', error);
       }
     });
     // Event listener untuk pencarian di halaman kategori
-    $('#search-input').off('input').on('input', function () {
+    $('.search-input').off('input').on('input', function () {
       const searchQuery = $(this).val().toLowerCase(); // Ambil nilai input
       const filteredCategories = allCategories.filter(category =>
         category.strCategory.toLowerCase().includes(searchQuery)
@@ -63,38 +100,21 @@ $(document).ready(function () {
 
   // fungsi untuk menampilkan daftar kategori
   function displayCategoryList(categories) {
-    let categoryHtml = `
-      <div class="flex flex-col h-72 bg-gray-50 justify-center">
-        <div class="flex flex-col gap-6 w-full justify-center items-center ">
-          <div id="jumbotronIcon" class="flex text-secondary gap-4">
-            <img src="/public/soup.svg" alt="Soup" class="text-secondary">
-            <img src="/public/utensils.svg" alt="Utensils" class="text-secondary">
-            <img src="/public/cake.svg" alt="Cake" class="text-secondary">
-          </div>
-          <span id="jumbotronDesc" class="text-xl text-primary font-semibold">mealapp API Website</span>
-        </div>
-        <h1 id="jumbotronLabel" class="text-3xl md:text-[46px] lg:text-[64px] font-bold text-primary text-center my-6">See All The Delicous
-          Foods</h1>
-      </div>
-      <div class="p-4 md:py-10 md:px-20 xl:px-40">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">`;
+    let categoryList = '';
     if (categories.length === 0) {
-      categoryHtml += `<p class="text-center text-xl text-red-500 col-span-full">No categories found.</p>`;
+      categoryList += `<p class="text-center text-xl text-red-500 col-span-full">No categories found.</p>`;
     } else {
       categories.forEach(function (category) {
-        categoryHtml += `
+        categoryList += `
           <div class="box cursor-pointer relative group overflow-hidden rounded-2xl" onclick="navigateToCategoryDetail('${category.strCategory}')">
-              <img src="${category.strCategoryThumb}" alt="${category.strCategory}" class="w-full object-cover group-hover:scale-110 h-40 transition-all rounded-2xl" />
-              <div class="absolute inset-0 bg-black rounded-2xl bg-opacity-40 flex items-center justify-center group-hover:opacity-100 transition-opacity duration-300">
-                <span class="text-white text-center text-xl font-semibold px-2">${category.strCategory}</span>
-              </div>
+            <img src="${category.strCategoryThumb}" alt="${category.strCategory}" class="w-full object-cover group-hover:scale-110 h-40 transition-all rounded-2xl" />
+            <div class="absolute inset-0 bg-black rounded-2xl bg-opacity-40 flex items-center justify-center group-hover:opacity-100 transition-opacity duration-300">
+              <span class="text-white text-center text-xl font-semibold px-2">${category.strCategory}</span>
+            </div>
           </div>`;
       });
     }
-    categoryHtml += '</div></div>';
-    $('#app-container').html(categoryHtml);
-    document.title = 'mealapp';
-    history.pushState({ page: 'category' }, 'Categories', '/');
+    $('#categoryList').html(categoryList);
     // animasi category list
     gsap.to(".box", {
       duration: 1,
@@ -103,30 +123,6 @@ $(document).ready(function () {
       y: 0,
       ease: "back.out",
       force3D: true
-    });
-    // animasi untuk jumbotronIcon
-    gsap.to("#jumbotronIcon > img", {
-      y: -10,
-      rotate: 360,
-      duration: 1,
-      repeat: -1,
-      repeatDelay: 1,
-      ease: 'elastic.inOut',
-      yoyo: true,
-      stagger: 0.5
-    });
-    gsap.from("#jumbotronLabel", {
-      y: -50,
-      opacity: 0,
-      duration: 1,
-      ease: 'back.out',
-    });
-    gsap.from("#jumbotronDesc", {
-      y: -50,
-      opacity: 0,
-      duration: 1,
-      delay: 0.2,
-      ease: 'back.out',
     });
   }
 
@@ -137,48 +133,59 @@ $(document).ready(function () {
       type: 'GET',
       success: function (response) {
         allMeals = response.meals;
-        displayDetailCategory(allMeals, categoryName);
+        let mealHtml = `
+        <div class="p-4 md:py-10 md:px-20 xl:px-40 bg-gray-50">
+          <div class="font-semibold text-secondary items-center flex flex-wrap gap-2 w-full">
+            <div class="flex gap-[2px]">
+              <img src="/public//home.svg" alt="Soup" class="text-secondary">
+              <span class="cursor-pointer" onclick="navigateToCategoryList()">Home</span>
+            </div>
+            / 
+            <span class="text-gray-400">${categoryName}</span>
+          </div> 
+          <h2 class="text-3xl md:text-[46px] xl:text-[64px] text-primary font-bold my-4 md:my-6 xl:my-8">${categoryName}</h2>
+          <div id="categoryList" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"></div>
+        </div>`;
+        $('#app-container').html(mealHtml);
+        displayDetailCategory(allMeals);
+        document.title = `mealapp : ${categoryName}`;
+        history.pushState({ page: 'category-detail', param: categoryName }, `Category: ${categoryName}`, `?category-name=${categoryName}`);
+        // animasi category list
+        gsap.to(".box", {
+          duration: 1,
+          opacity: 1,
+          stagger: 0.1,
+          y: 0,
+          ease: "back.out",
+          force3D: true
+        });
       },
       error: function (error) {
         console.error('Error fetching meals', error);
       }
     });
     // Event listener untuk pencarian di halaman detail kategori
-    $('#search-input').off('input').on('input', function () {
+    $('.search-input').off('input').on('input', function () {
       const searchQuery = $(this).val().toLowerCase(); // Ambil nilai input
       const filterdMeals = allMeals.filter(meal =>
         meal.strMeal.toLowerCase().includes(searchQuery)
       );
-      displayDetailCategory(filterdMeals, categoryName);
+      displayDetailCategory(filterdMeals);
     });
+
   }
 
-  function displayDetailCategory(meals, categoryName) {
-    let mealHtml = `
-        <div class="p-4 md:py-10 md:px-20 xl:px-40 bg-gray-50">
-        <div class="font-semibold text-secondary items-center flex flex-wrap gap-2 w-full">
-          <div class="flex gap-[2px]">
-            <img src="/public//home.svg" alt="Soup" class="text-secondary">
-            <span class="cursor-pointer" onclick="navigateToCategoryList()">Home</span>
-          </div>
-          / 
-          <span class="text-gray-400">${categoryName}</span>
-        </div>      
-        <h2 class="text-3xl md:text-[46px] xl:text-[64px] text-primary font-bold my-4 md:my-6 xl:my-8">${categoryName}</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">`;
+  function displayDetailCategory(meals) {
+    let listMeal = '';
     meals.forEach(function (meal) {
-      mealHtml += `
-            <div class="box cursor-pointer relative group overflow-hidden rounded-2xl" onclick="navigateToMealDetail('${meal.idMeal}')">
-              <img src="${meal.strMealThumb}" alt="${meal.strMeal}" class="w-full object-cover group-hover:scale-110 h-40 transition-all duration-300" />
-              <div class="absolute inset-0 bg-black rounded-2xl bg-opacity-40 flex items-center justify-center group-hover:opacity-100 transition-opacity ">
-                <span class="text-white text-center text-xl font-semibold px-2">${meal.strMeal}</span>
-              </div>
-            </div>`;
+      listMeal += `<div class="box cursor-pointer relative group overflow-hidden rounded-2xl" onclick="navigateToMealDetail('${meal.idMeal}')">
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}" class="w-full object-cover group-hover:scale-110 h-40 transition-all duration-300" />
+          <div class="absolute inset-0 bg-black rounded-2xl bg-opacity-40 flex items-center justify-center group-hover:opacity-100 transition-opacity ">
+            <span class="text-white text-center text-xl font-semibold px-2">${meal.strMeal}</span>
+          </div>
+        </div>`;
     });
-    mealHtml += '</div></div>';
-    $('#app-container').html(mealHtml);
-    document.title = `mealapp : ${categoryName}`;
-    history.pushState({ page: 'category-detail', param: categoryName }, `Category: ${categoryName}`, `?category-name=${categoryName}`);
+    $('#categoryList').html(listMeal);
     // animasi category list
     gsap.to(".box", {
       duration: 1,
@@ -279,7 +286,6 @@ $(document).ready(function () {
           $('#readmore').text($('#instructionText').hasClass('h-auto') ?
             'Read Less' : 'Read More');
         });
-
         document.title = `mealapp : ${meal.strMeal}`;
         history.pushState({ page: 'meal-detail', param: mealId }, `Meal: ${meal.strMeal}`, `?meal-id=${mealId}`);
         // animasi untuk detail meal label
