@@ -15,17 +15,22 @@ Single Page Aplication
 
 ### Requirements
 - Node JS
+- git
 
 ### Steps
-#### 1. Install Dependency
+#### 1. Clone Repository
+- on terminal paste `git clone https://github.com/dryladen/cmlabs-frontend-internship-test.git`
+- and then type `cd cmlabs-frontend-internship-test`
 
-type `npm install` on terminal
+#### 2. Install Dependency
 
-#### 2. Run Server
+- type `npm install` on terminal
 
-type `npm run start` on terminal
+#### 3. Run Server
 
-#### 3. Open the URL
+- type `npm run start` on terminal
 
-open url in the browser `http://localhost:3000`
+#### 4. Open the URL
+
+- open url in the browser `http://localhost:3000`
 
