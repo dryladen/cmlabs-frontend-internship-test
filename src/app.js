@@ -1,4 +1,6 @@
 $(document).ready(function () {
+  let allCategories = [];
+  let allMeals = [];
   // Inisialisasi halaman pertama (List of Categories)
   loadCategoryPage();
 
@@ -35,39 +37,56 @@ $(document).ready(function () {
       url: 'https://www.themealdb.com/api/json/v1/1/categories.php',
       type: 'GET',
       success: function (response) {
-        const categories = response.categories;
-        let categoryHtml = `
-          <div class="flex flex-col gap-6 w-full justify-center items-center ">
-            <div class="flex text-secondary gap-4">
-              <img src="./public/soup.svg" alt="Soup" class="text-secondary">
-              <img src="./public/utensils.svg" alt="Utensils" class="text-secondary">
-              <img src="./public/cake.svg" alt="Cake" class="text-secondary">
-            </div>
-            <span class="text-xl text-primary font-semibold">mealapp API Website</span>
-          </div>
-          <h1 class="text-3xl md:text-[46px] lg:text-[64px] font-bold text-primary text-center my-6">See All The Delicous Foods</h1>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6">`;
-        categories.forEach(function (category) {
-          categoryHtml += `
-            <div class="cursor-pointer relative group overflow-hidden rounded-2xl" onclick="navigateToCategoryDetail('${category.strCategory}')">
-                <img src="${category.strCategoryThumb}" alt="${category.strCategory}" class="w-full object-cover group-hover:scale-110 h-40 transition-all rounded-2xl" />
-                <div class="absolute inset-0 bg-black rounded-2xl bg-opacity-40 flex items-center justify-center group-hover:opacity-100 transition-opacity duration-300">
-                  <span class="text-white text-center text-xl font-semibold px-2">${category.strCategory}</span>
-                </div>
-            </div>
-          `;
-        });
-        categoryHtml += '</div>';
-        $('#app-container').html(categoryHtml);
-        document.title = 'mealapp';
-        history.pushState({ page: 'category' }, 'Categories', '/');
+        allCategories = response.categories;
+        console.log(allCategories);
+        displayCategoryList(allCategories);
       },
       error: function (error) {
         console.error('Error fetching categories', error);
       }
     });
+    // Event listener untuk pencarian di halaman kategori
+    $('#search-input').off('input').on('input', function () {
+      const searchQuery = $(this).val().toLowerCase(); // Ambil nilai input
+      const filteredCategories = allCategories.filter(category => 
+        category.strCategory.toLowerCase().includes(searchQuery)
+      );
+      displayCategoryList(filteredCategories);
+    });
   }
 
+  function displayCategoryList(categories) {
+    let categoryHtml = `
+      <div class="flex flex-col gap-6 w-full justify-center items-center ">
+        <div class="flex text-secondary gap-4">
+          <img src="/src/public/soup.svg" alt="Soup" class="text-secondary">
+          <img src="/src/public/utensils.svg" alt="Utensils" class="text-secondary">
+          <img src="/src/public/cake.svg" alt="Cake" class="text-secondary">
+        </div>
+        <span class="text-xl text-primary font-semibold">mealapp API Website</span>
+      </div>
+      <h1 class="text-3xl md:text-[46px] lg:text-[64px] font-bold text-primary text-center my-6">See All The Delicous Foods</h1>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6">`;
+
+    if (categories.length === 0) {
+      categoryHtml += `<p class="text-center text-xl text-red-500 col-span-full">No categories found.</p>`;
+    } else {
+      categories.forEach(function (category) {
+        categoryHtml += `
+          <div class="cursor-pointer relative group overflow-hidden rounded-2xl" onclick="navigateToCategoryDetail('${category.strCategory}')">
+              <img src="${category.strCategoryThumb}" alt="${category.strCategory}" class="w-full object-cover group-hover:scale-110 h-40 transition-all rounded-2xl" />
+              <div class="absolute inset-0 bg-black rounded-2xl bg-opacity-40 flex items-center justify-center group-hover:opacity-100 transition-opacity duration-300">
+                <span class="text-white text-center text-xl font-semibold px-2">${category.strCategory}</span>
+              </div>
+          </div>`;
+      });
+    }
+
+    categoryHtml += '</div>';
+    $('#app-container').html(categoryHtml);
+    document.title = 'mealapp';
+    history.pushState({ page: 'category' }, 'Categories', '/');
+  }
   // Fungsi untuk memuat halaman detail kategori
   function loadCategoryDetailPage(categoryName) {
     $.ajax({
@@ -78,7 +97,7 @@ $(document).ready(function () {
         let mealHtml = `
         <div class="font-semibold text-secondary items-center flex flex-wrap gap-2 w-full">
           <div class="flex gap-[2px]">
-            <img src="./public/home.svg" alt="Soup" class="text-secondary">
+            <img src="/src/public//home.svg" alt="Soup" class="text-secondary">
             <span class="cursor-pointer" onclick="navigateToCategoryList()">Home</span>
           </div>
           / 
@@ -114,15 +133,22 @@ $(document).ready(function () {
       success: function (response) {
         const meal = response.meals[0];
         let ingredientsHtml = '';
+        let instructionHTML = '';
         for (let i = 1; i <= 20; i++) {
           if (meal[`strIngredient${i}`]) {
             ingredientsHtml += `<li>${meal[`strIngredient${i}`]} - ${meal[`strMeasure${i}`]}</li>`;
           }
         }
+        let instructionText = meal.strInstructions.split('\r\n');
+        for (let i = 0; i < instructionText.length; i++) {
+          if (instructionText[i]) {
+            instructionHTML += `<p>${instructionText[i]}</p><br>`;
+          }
+        }
         const mealDetailHtml = `
           <div class="font-semibold text-secondary items-center flex flex-wrap gap-2 w-full">
             <div class="flex gap-[2px]">
-              <img src="./public/home.svg" alt="Soup" class="text-secondary">
+              <img src="/src/public//home.svg" alt="Soup" class="text-secondary">
               <span class="cursor-pointer" onclick="navigateToCategoryList()">Home</span>
             </div> /
             <span class="cursor-pointer" onclick="navigateToCategoryDetail('${meal.strCategory}')">${meal.strCategory}</span> /
@@ -144,7 +170,7 @@ $(document).ready(function () {
                 </div>
                 <div class="flex flex-col gap-4">
                   <div class="flex gap-2 items-center text-secondary ">
-                    <img src="./public/scroll-text.svg" alt="scroll-text.svg">
+                    <img src="/src/public//scroll-text.svg" alt="scroll-text.svg">
                     <h3 class="text-3xl font-semibold ">Recipes</h3>
                   </div>
                   <ul
@@ -156,17 +182,17 @@ $(document).ready(function () {
               <div class="flex flex-col  gap-4">
                 <div class="flex flex-col gap-4">
                   <div class="flex gap-2 items-center text-secondary ">
-                    <img src="./public/chef-hat.svg" alt="chef-hat">
+                    <img src="/src/public//chef-hat.svg" alt="chef-hat">
                     <h3 class="text-3xl font-semibold ">Instruction</h3>
                   </div>
-                  <p id="instruction" class="p-4 border-[1px] border-secondary rounded-lg bg-white bg-opacity-50 text-primary font-medium">
-                    ${meal.strInstructions}
-                  </p>
+                  <div class="p-4 border-[1px] border-secondary rounded-lg bg-white bg-opacity-50 text-primary font-medium">
+                    ${instructionHTML}
+                  </div>
                 </div>
                 <hr class="border-secondary my-6">
                 <div class="flex flex-col">
                   <div class="flex gap-2 items-center text-secondary ">
-                    <img src="./public/youtube.svg" alt="youtube.svg">
+                    <img src="/src/public//youtube.svg" alt="youtube.svg">
                     <h3 class="text-3xl font-semibold ">Video Tutorial</h3>
                   </div>
                   <iframe class="mt-4 mx-auto block w-full h-96 rounded-lg" src="https://www.youtube.com/embed/${meal.strYoutube.split('v=')[1]}"
