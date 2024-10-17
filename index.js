@@ -1,17 +1,18 @@
-var fs = require('fs');
-var http = require('http');
+const express = require('express');
+const path = require('path');
 
-http.createServer(function (request, response) {
-    // baca file
-    fs.readFile('./src/index.html', (err, data) => {
-        if (err) throw err;
-        
-        // kirim respon
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        response.write(data);
-        response.end();
-    });
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-}).listen(8000);
+// Middleware untuk melayani file statis dari folder src
+app.use(express.static(path.join(__dirname, 'src')));
 
-console.log("server running on http://localhost:8000");
+// Route untuk halaman utama
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'src/index.html'));
+});
+
+// Mulai server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
